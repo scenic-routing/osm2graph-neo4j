@@ -5,8 +5,10 @@ import java.io.File;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
+import me.callsen.taylor.osm2graph_neo4j.helper.OsmSource;
+
 public class Main {
-    
+
 	public static void main( String[] args ) throws Exception {
     
     // Parameters
@@ -26,6 +28,10 @@ public class Main {
     GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( new File( graphDbPath ) );
     System.out.println("graph db initialized: " + graphDb);
 
+    // Load OSM file - initialze Sniffer objects
+    OsmSource.loadNodes(osmFilePath, graphDb);
+    
+    // Shutdown GraphDB
     graphDb.shutdown();
 
   }

@@ -36,10 +36,28 @@
     </plugins>
   </build>
   <dependencies>
+    
+    <!-- Noe4j -->
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j</artifactId>
       <version>3.5.11</version>
     </dependency>
+    
+    <!-- XML Sniffer -->
+    <dependency>
+        <groupId>in.jlibs</groupId>
+        <artifactId>jlibs-xmldog</artifactId>
+        <version>2.2.2</version>
+    </dependency>
+
+    <!-- JSON Objects -->
+    <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20190722</version>
+    </dependency>
+
+
   </dependencies>
 </project>
