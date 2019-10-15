@@ -25,40 +25,42 @@ import javax.xml.transform.stream.StreamResult;
 
 public class OsmSource {
 
-  public static void loadNodes(String osmFilePath, GraphDatabaseService grahpDb) throws Exception {
+  public static void loadNodes(String osmFilePath, GraphWrapper graphWrapper) throws Exception {
 
-    //configure xpath query
+    // configure xpath query
 		XMLDog dog = new XMLDog( new DefaultNamespaceContext() );
 		Expression xpath1 = dog.addXPath("/osm/node");
 		
-		//configure sniffer and execute query
+		// configure sniffer and execute query
 		Event event = dog.createEvent();
 		XPathResults results = new XPathResults(event);
 		event.setXMLBuilder(new DOMBuilder());
 		
-		//declare event callback for when xpath is hit
+		// declare event callback for when xpath node is hit
 		event.setListener(new InstantEvaluationListener(){
-			@Override
+      
+      @Override
       public void onNodeHit(Expression expression, NodeItem nodeItem){
         
-        //marshal XML node to JSON Object
+        // marshal XML node to JSON Object
         JSONObject nodeJsonObject = xmlNodeToJson( (Node)nodeItem.xml ).getJSONObject("node");
 
-        //add geom field
+        // add geom field
         nodeJsonObject.put("geom", "POINT(" + nodeJsonObject.getDouble("lon") + " " + nodeJsonObject.getDouble("lat") + ")");
 
-        
+        // write node to graph database
+        graphWrapper.createIntersection(nodeJsonObject);
 
       }
+
+      // not usering these functions at the moment but must be over-ridden
       @Override
       public void finishedNodeSet(Expression expression){
-          //tight
       }
-
       @Override
       public void onResult(Expression expression, Object result){
-          //dude
       }
+
 		});		
 		
 		//kick off dog sniffer
