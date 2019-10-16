@@ -1,6 +1,4 @@
-package me.callsen.taylor.osm2graph_neo4j.helper;
-
-import org.neo4j.graphdb.GraphDatabaseService;
+package me.callsen.taylor.osm2graph_neo4j.data;
 
 import org.xml.sax.InputSource;
 import jlibs.xml.DefaultNamespaceContext;
@@ -25,7 +23,7 @@ import javax.xml.transform.stream.StreamResult;
 
 public class OsmSource {
 
-  public static void loadNodes(String osmFilePath, GraphWrapper graphWrapper) throws Exception {
+  public static void loadNodes(String osmFilePath, GraphDb graphDb) throws Exception {
 
     // configure xpath query
 		XMLDog dog = new XMLDog( new DefaultNamespaceContext() );
@@ -49,7 +47,7 @@ public class OsmSource {
         nodeJsonObject.put("geom", "POINT(" + nodeJsonObject.getDouble("lon") + " " + nodeJsonObject.getDouble("lat") + ")");
 
         // write node to graph database
-        graphWrapper.createIntersection(nodeJsonObject);
+        graphDb.createIntersection(nodeJsonObject);
 
       }
 

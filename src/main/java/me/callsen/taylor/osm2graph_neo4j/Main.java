@@ -1,7 +1,7 @@
 package me.callsen.taylor.osm2graph_neo4j;
 
-import me.callsen.taylor.osm2graph_neo4j.helper.GraphWrapper;
-import me.callsen.taylor.osm2graph_neo4j.helper.OsmSource;
+import me.callsen.taylor.osm2graph_neo4j.data.GraphDb;
+import me.callsen.taylor.osm2graph_neo4j.data.OsmSource;
 
 public class Main {
 
@@ -21,13 +21,13 @@ public class Main {
     System.out.println("   graphDb: " + graphDbPath);
 
     // Initialize GraphDB Wrapper - provides utility functions to facilitate loading of data
-    GraphWrapper graphWrapper = new GraphWrapper(graphDbPath);
+    GraphDb graphDb = new GraphDb(graphDbPath);
 
     // Load OSM nodes into graph - loads XML data using SAX event-driven parsing
-    OsmSource.loadNodes(osmFilePath, graphWrapper);
+    OsmSource.loadNodes(osmFilePath, graphDb);
     
     // Shutdown GraphDB
-    graphWrapper.shutdown();
+    graphDb.shutdown();
 
   }
 
