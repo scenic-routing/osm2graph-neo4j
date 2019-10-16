@@ -19,18 +19,11 @@ public class GraphDb {
 	private GraphDatabaseService db;
 	
 	public GraphDb(String graphDbPath) throws Exception {
-
     db = new GraphDatabaseFactory().newEmbeddedDatabase( new File( graphDbPath ) );
     System.out.println("Graph DB @ " + graphDbPath + " initialized");
-
   }
 
-  public void shutdown(){
-    this.db.shutdown();
-    System.out.println("Graph DB shutdown");
-  }
-
-  public void createIntersection(JSONObject nodeJsonObject) {
+  public void createNode(JSONObject nodeJsonObject) {
 		
 		Transaction tx = null;
 		try {
@@ -52,7 +45,12 @@ public class GraphDb {
 		}
 		
   }
-  
+
+  public void shutdown(){
+    this.db.shutdown();
+    System.out.println("Graph DB shutdown");
+  }
+
   public void truncateGraphNodes() {
 		
 		System.out.println("truncating graph nodes..");

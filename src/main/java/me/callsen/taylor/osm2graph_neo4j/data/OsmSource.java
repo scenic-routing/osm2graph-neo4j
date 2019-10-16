@@ -23,7 +23,13 @@ import javax.xml.transform.stream.StreamResult;
 
 public class OsmSource {
 
-  public static void loadNodes(String osmFilePath, GraphDb graphDb) throws Exception {
+  protected InputSource osmInputSource;
+
+  public OsmSource(String osmFilePath) {
+    osmInputSource = new InputSource(osmFilePath);
+  }
+
+  public void loadNodesIntoDb(GraphDb graphDb) throws Exception {
 
     // configure xpath query
 		XMLDog dog = new XMLDog( new DefaultNamespaceContext() );
@@ -47,22 +53,20 @@ public class OsmSource {
         nodeJsonObject.put("geom", "POINT(" + nodeJsonObject.getDouble("lon") + " " + nodeJsonObject.getDouble("lat") + ")");
 
         // write node to graph database
-        graphDb.createIntersection(nodeJsonObject);
+        graphDb.createNode(nodeJsonObject);
 
       }
 
-      // not usering these functions at the moment but must be over-ridden
+      // not usering these functions at the moment but must be overridden
       @Override
-      public void finishedNodeSet(Expression expression){
-      }
+      public void finishedNodeSet(Expression expression){ }
       @Override
-      public void onResult(Expression expression, Object result){
-      }
+      public void onResult(Expression expression, Object result){ }
 
 		});		
 		
 		//kick off dog sniffer
-		dog.sniff(event, new InputSource( osmFilePath ), false);
+		dog.sniff(event, this.osmInputSource, false);
 
   }
 
