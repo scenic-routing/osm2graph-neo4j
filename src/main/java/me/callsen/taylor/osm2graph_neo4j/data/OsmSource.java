@@ -13,6 +13,7 @@ import jlibs.xml.sax.dog.sniff.Event;
 import java.io.StringWriter;
 import org.w3c.dom.Node;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import org.json.XML;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -47,7 +48,10 @@ public class OsmSource {
       public void onNodeHit(Expression expression, NodeItem nodeItem){
         
         // marshal XML node to JSON Object
-        JSONObject nodeJsonObject = xmlNodeToJson( (Node)nodeItem.xml ).getJSONObject("node");
+        JSONObject rawNodeJsonObject = xmlNodeToJson( (Node)nodeItem.xml ).getJSONObject("node");
+
+        // prepare osm item props for ingest into Neo4j (move id, flatten tags array)
+        JSONObject nodeJsonObject = assembleOsmItemProps(rawNodeJsonObject);
 
         // add geom field
         nodeJsonObject.put("geom", "POINT(" + nodeJsonObject.getDouble("lon") + " " + nodeJsonObject.getDouble("lat") + ")");
@@ -57,7 +61,7 @@ public class OsmSource {
 
       }
 
-      // not usering these functions at the moment but must be overridden
+      // not using these functions at the moment but must be overridden
       @Override
       public void finishedNodeSet(Expression expression){ }
       @Override
@@ -65,14 +69,15 @@ public class OsmSource {
 
 		});		
 		
-		//kick off dog sniffer
+		// kick off dog sniffer
 		dog.sniff(event, this.osmInputSource, false);
 
   }
 
+  // surely taken from stackoverflow
   public static JSONObject xmlNodeToJson(Node node) {
 		
-		//convert XML node to string
+		// convert XML node to string
     StringWriter sw = new StringWriter();
     Transformer xmlT;
 		try {
@@ -85,8 +90,41 @@ public class OsmSource {
 		}
 		String xmlNodeString = sw.toString();
 		
-		//parse string representation into JSONObject and return
-		return XML.toJSONObject( xmlNodeString );
+		// parse string representation into JSONObject and return
+    return XML.toJSONObject( xmlNodeString );
+    
+  }
+  
+  public static JSONObject assembleOsmItemProps(JSONObject osmItem) {
+		
+		// create props object based on props of original item
+		JSONObject propsObject = new JSONObject(osmItem, JSONObject.getNames(osmItem));
+
+    // tags - move from nested tag array and place as propreties directly on node 
+		if (osmItem.has("tag")) {
+			JSONArray tagsArray = osmItem.optJSONArray("tag");
+			if (tagsArray != null) {
+				// handle tags property as a JSONArray
+				for (int i = 0; i < tagsArray.length(); i++) {
+					JSONObject prop = tagsArray.getJSONObject(i);
+					propsObject.put(prop.getString("k"), prop.get("v"));
+				}
+			} else {
+				// if fails, handle tag property as a JSONObject
+				JSONObject tagObject = osmItem.getJSONObject("tag");
+				propsObject.put(tagObject.getString("k"), tagObject.get("v"));
+			}
+		}
+		
+    // move osm id to osm_id prop (so doesn't conflict with neo4j id)		
+    propsObject.put("osm_id", osmItem.get("id"));
+  
+    // remove tags and id props
+    propsObject.remove("tag");
+    propsObject.remove("id");
+
+		return propsObject;
+		
 	}
 
 }

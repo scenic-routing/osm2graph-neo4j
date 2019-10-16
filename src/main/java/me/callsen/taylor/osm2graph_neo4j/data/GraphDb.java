@@ -37,9 +37,9 @@ public class GraphDb {
 			}
 			
 			tx.success();
-			System.out.println("creating intersection for node id " + nodeJsonObject.getLong("id"));
+			System.out.println("creating intersection for node id " + nodeJsonObject.getLong("osm_id"));
 		} catch (Exception e) { 
-			System.out.println("FAILED to create intersection for node id " + nodeJsonObject.getInt("id")); System.out.println(e.toString());
+			System.out.println("FAILED to create intersection for node id " + nodeJsonObject.getInt("osm_id")); System.out.println(e.toString());
 		} finally {
 			tx.close();
 		}
