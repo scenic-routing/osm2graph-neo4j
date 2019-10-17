@@ -46,6 +46,36 @@ public class GraphDb {
 		
   }
 
+  public void createRelationship(JSONObject wayJsonObject, long wayStartOsmId, long wayEndOsmId) {
+	
+		Transaction tx = null;
+		try {
+			
+			tx = this.db.beginTx();
+			
+			//retrieve start and stop nodes by osm_id (osm_source_id within graph); create relationship between nodes that will correspond to road / way
+			Node startNode = this.db.findNode( NodeLabels.INTERSECTION , "osm_id", wayStartOsmId );
+			Node endNode = this.db.findNode( NodeLabels.INTERSECTION , "osm_id", wayEndOsmId );
+			Relationship newRelationship = startNode.createRelationshipTo( endNode , RelationshipTypes.CONNECTS );
+			
+			//apply properties to newly created Relationship (representing a road / way)
+			for (String key : wayJsonObject.keySet()) {
+				newRelationship.setProperty(key, wayJsonObject.get(key));
+			}
+			
+			tx.success();
+			
+			System.out.println("creating road relationship in Graph for node osm_ids " + wayStartOsmId + " and "+ wayEndOsmId + "; road relationship graph id " + newRelationship.getId() );
+			
+		} catch (Exception e) {
+			System.out.println("FAILED to create road relationship in Graph for node osm_ids " + wayStartOsmId + " and "+ wayEndOsmId + "; road relationship id road id not available" ); 
+			e.printStackTrace();
+		} finally {
+			tx.close();
+		}
+		
+	}
+
   public void shutdown(){
     this.db.shutdown();
     System.out.println("Graph DB shutdown");

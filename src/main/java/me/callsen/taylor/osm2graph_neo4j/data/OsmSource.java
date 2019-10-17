@@ -104,6 +104,7 @@ public class OsmSource {
         JSONArray wayNodesList = rawWayJsonObject.optJSONArray("nd");
         if (wayNodesList == null) return; //skip if nodes not supplied or singular (we can't create a road here anyways)
         
+
         // assemble way properties object from any XML properties - shared/overwritten in all iterations of for loop below
         JSONObject wayPropsObject = assembleOsmItemProps(rawWayJsonObject);
         
@@ -112,20 +113,20 @@ public class OsmSource {
           // create two-way way representation in graph since both directions are walkable
           //	- normally this is where one-way enforcement would take place
           
-          long wayStartId = wayNodesList.getJSONObject(nodeIndex).getLong("ref");
-          long wayEndId = wayNodesList.getJSONObject(nodeIndex - 1).getLong("ref");
+          long wayStarOsmId = wayNodesList.getJSONObject(nodeIndex).getLong("ref");
+          long wayEndOsmId = wayNodesList.getJSONObject(nodeIndex - 1).getLong("ref");
           
           // forward
           
           GeomUtil.setWayGeometry(nodeShapeSource, wayPropsObject, wayNodesList, nodeIndex, nodeIndex - 1 );
           String geometry = wayPropsObject.getString("way");
-          //App.postgisStore.writeWay(wayPropsObject, Xml.way_pair_id, wayStartId, wayEndId);
+          graphDb.createRelationship(wayPropsObject, wayStarOsmId, wayEndOsmId);
           
           // backward - flip the start and stop Nodes to create the same relationship in the other direction (Neo4j does not support bi-directional relationships)
           
           GeomUtil.setWayGeometry(nodeShapeSource, wayPropsObject, wayNodesList, nodeIndex - 1 , nodeIndex );
           geometry = wayPropsObject.getString("way");
-          // App.postgisStore.writeWay(wayPropsObject, Xml.way_pair_id, wayEndId, wayStartId);
+          graphDb.createRelationship(wayPropsObject, wayEndOsmId, wayStarOsmId);
         
         }
 
@@ -189,9 +190,10 @@ public class OsmSource {
     // move osm id to osm_id prop (so doesn't conflict with neo4j id)		
     propsObject.put("osm_id", osmItem.get("id"));
   
-    // remove tags and id props
+    // remove tags, id, and other non-needed props
     propsObject.remove("tag");
     propsObject.remove("id");
+    propsObject.remove("nd");
 
 		return propsObject;
 		
