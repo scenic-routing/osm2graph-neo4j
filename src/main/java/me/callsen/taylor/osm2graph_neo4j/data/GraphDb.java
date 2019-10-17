@@ -46,6 +46,28 @@ public class GraphDb {
 		
   }
 
+  public void getNodeLonLatString(Long osmId) {
+		
+		Transaction tx = null;
+		try {
+			
+			tx = this.db.beginTx();
+			
+      ExecutionResult result = this.db.execute( "MATCH (n:INTERSECTION) WHERE n.osm_id = " + osmId + " RETURN n.lon, n.lat" );
+
+      return result.single().get(0).asString() + ", " + result.single().get(1).asString();
+
+			tx.success();
+			
+		} catch (Exception e) {
+			System.out.println("feailed to get lonLat string of osm id " + osmId); 
+			e.printStackTrace();
+		} finally {
+			tx.close();
+		}
+		
+	}
+
   public void shutdown(){
     this.db.shutdown();
     System.out.println("Graph DB shutdown");
