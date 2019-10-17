@@ -37,7 +37,7 @@
   </build>
   <dependencies>
     
-    <!-- Noe4j -->
+    <!-- Neo4j -->
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j</artifactId>

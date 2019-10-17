@@ -10,6 +10,10 @@ import jlibs.xml.sax.dog.expr.InstantEvaluationListener;
 import jlibs.xml.sax.dog.sniff.DOMBuilder;
 import jlibs.xml.sax.dog.sniff.Event;
 
+import me.callsen.taylor.osm2graph_neo4j.geo.GeomUtil;
+import me.callsen.taylor.osm2graph_neo4j.geo.INodeShapeSource;
+import me.callsen.taylor.osm2graph_neo4j.geo.impl.GraphNodeShapeSource;
+
 import java.io.StringWriter;
 import org.w3c.dom.Node;
 import org.json.JSONObject;
@@ -84,7 +88,10 @@ public class OsmSource {
 		Event event = dog.createEvent();
 		XPathResults results = new XPathResults(event);
 		event.setXMLBuilder(new DOMBuilder());
-		
+    
+    // configure GraphNodeShapeSource to use a source for Node longitutate and latitute
+    INodeShapeSource nodeShapeSource = new GraphNodeShapeSource(graphDb);
+
 		// declare event callback for when xpath is hit
 		event.setListener(new InstantEvaluationListener(){
 			@Override
@@ -100,7 +107,7 @@ public class OsmSource {
         // assemble way properties object from any XML properties - shared/overwritten in all iterations of for loop below
         JSONObject wayPropsObject = assembleOsmItemProps(rawWayJsonObject);
         
-        /* for (int nodeIndex = 1; nodeIndex < wayNodesList.length(); ++nodeIndex) {
+        for (int nodeIndex = 1; nodeIndex < wayNodesList.length(); ++nodeIndex) {
           
           // create two-way way representation in graph since both directions are walkable
           //	- normally this is where one-way enforcement would take place
@@ -110,20 +117,21 @@ public class OsmSource {
           
           // forward
           
-          Xml.setWayGeometry(wayPropsObject, wayNodesList, nodeIndex, nodeIndex - 1 );
+          GeomUtil.setWayGeometry(nodeShapeSource, wayPropsObject, wayNodesList, nodeIndex, nodeIndex - 1 );
           String geometry = wayPropsObject.getString("way");
-          App.postgisStore.writeWay(wayPropsObject, Xml.way_pair_id, wayStartId, wayEndId);
+          //App.postgisStore.writeWay(wayPropsObject, Xml.way_pair_id, wayStartId, wayEndId);
           
           // backward - flip the start and stop Nodes to create the same relationship in the other direction (Neo4j does not support bi-directional relationships)
           
-          Xml.setWayGeometry(wayPropsObject, wayNodesList, nodeIndex - 1 , nodeIndex );
+          GeomUtil.setWayGeometry(nodeShapeSource, wayPropsObject, wayNodesList, nodeIndex - 1 , nodeIndex );
           geometry = wayPropsObject.getString("way");
-          App.postgisStore.writeWay(wayPropsObject, Xml.way_pair_id, wayEndId, wayStartId);
+          // App.postgisStore.writeWay(wayPropsObject, Xml.way_pair_id, wayEndId, wayStartId);
         
+          // TODO: deal with this
           // iterate way_pair_id - used to associate the pair of way records once written to DB (used by adjacentRoads prcessing)
-          ++Xml.way_pair_id;
-  
-        } */
+          // ++Xml.way_pair_id;
+          System.out.println(geometry);
+        }
 
       }
 
