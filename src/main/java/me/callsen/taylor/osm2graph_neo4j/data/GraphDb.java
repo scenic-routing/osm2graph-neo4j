@@ -37,7 +37,7 @@ public class GraphDb {
 			}
 			
 			tx.success();
-			System.out.println("creating intersection for node id " + nodeJsonObject.getLong("osm_id"));
+			// System.out.println("created intersection for node id " + nodeJsonObject.getLong("osm_id"));
 		} catch (Exception e) { 
 			System.out.println("FAILED to create intersection for node id " + nodeJsonObject.getInt("osm_id")); System.out.println(e.toString());
 		} finally {
@@ -91,6 +91,86 @@ public class GraphDb {
 			e.printStackTrace();
 		} finally {
 			tx.close();
+		}
+		
+  }
+  
+  public void createNodeIdOsmIndex() {
+		
+		System.out.println("creating node index for quick retrieval with osm_id");
+		
+		//create node to create index off of
+		Node indexNode = null;
+		Transaction tx = null;
+		try {
+			
+			tx = this.db.beginTx();
+			
+			indexNode = this.db.createNode(NodeLabels.INTERSECTION);
+
+			tx.success();
+			
+		} catch (Exception e) {
+			System.out.println("failed to create index node!"); 
+			e.printStackTrace();
+		} finally {
+			tx.close();
+		}
+		
+		//create index
+		Transaction txB = null;
+		try {
+			
+			txB = this.db.beginTx();
+			
+			this.db.execute( "CREATE INDEX ON :INTERSECTION(osm_id)" );
+
+			txB.success();
+			
+		} catch (Exception e) {
+			System.out.println("failed to create index node!"); 
+			e.printStackTrace();
+		} finally {
+			txB.close();
+		}
+		
+		//delete node that index was created with
+		Transaction txC = null;
+		try {
+			
+			txC = this.db.beginTx();
+			
+			indexNode.delete();
+
+			txC.success();
+			
+		} catch (Exception e) {
+			System.out.println("failed to create index node!"); 
+			e.printStackTrace();
+		} finally {
+			txC.close();
+		}
+		
+  }
+  
+  public void dropNodeOsmIdIndex() {
+		
+		System.out.println("dropping node index for quick retrieval with osm_source_id");
+		
+		//drop index if exists
+		Transaction txdrop = null;
+		try {
+			
+			txdrop = this.db.beginTx();
+			
+			this.db.execute( "DROP INDEX ON :INTERSECTION(osm_id)" );
+
+			txdrop.success();
+			
+		} catch (Exception e) {
+			System.out.println("warning - failed to drop osm_source_id index; index may not exist (not necessarily an issue"); 
+		} finally {
+			txdrop.close();
 		}
 		
 	}
