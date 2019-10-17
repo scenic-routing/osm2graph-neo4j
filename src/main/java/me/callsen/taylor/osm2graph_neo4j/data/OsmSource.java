@@ -127,10 +127,6 @@ public class OsmSource {
           geometry = wayPropsObject.getString("way");
           // App.postgisStore.writeWay(wayPropsObject, Xml.way_pair_id, wayEndId, wayStartId);
         
-          // TODO: deal with this
-          // iterate way_pair_id - used to associate the pair of way records once written to DB (used by adjacentRoads prcessing)
-          // ++Xml.way_pair_id;
-          System.out.println(geometry);
         }
 
       }

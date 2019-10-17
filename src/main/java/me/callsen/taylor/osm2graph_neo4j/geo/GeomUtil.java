@@ -1,12 +1,20 @@
 package me.callsen.taylor.osm2graph_neo4j.geo;
 
-import org.json.JSONObject;
-
 import me.callsen.taylor.osm2graph_neo4j.geo.INodeShapeSource;
 
+import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.io.WKTReader;
+
+import org.json.JSONObject;
 import org.json.JSONArray;
 
 public class GeomUtil {
+
+  //shared static references to geometry libraries
+	private static GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory( null );
+	public static WKTReader reader = new WKTReader( geometryFactory );
 
   public static void setWayGeometry( INodeShapeSource nodeShapeSource, JSONObject wayPropsObject , JSONArray wayNodesList , int wayStartIndex , int wayEndIndex ) {
     
@@ -39,9 +47,9 @@ public class GeomUtil {
         //append list of osm node attrId refs
         wayPropsObject.put("refOsmNodes", refOsmNodes.toString());
         
-        //utilized geotools library to compute length and bounds of road
-        //LineString lineStringGeom = (LineString) App.reader.read(lineString);
-        //wayPropsObject.put("length", lineStringGeom.getLength() * (Math.PI/180) * 6378137); //http://gis.stackexchange.com/questions/14449/java-vividsolutions-jts-wgs-84-distance-to-meters
+        // utilized geotools library to compute length of road
+        LineString lineStringGeom = (LineString) reader.read(lineString);
+        wayPropsObject.put("length", lineStringGeom.getLength() * (Math.PI/180) * 6378137); //http://gis.stackexchange.com/questions/14449/java-vividsolutions-jts-wgs-84-distance-to-meters
     
     } catch (Exception e) { e.printStackTrace(); }
         
