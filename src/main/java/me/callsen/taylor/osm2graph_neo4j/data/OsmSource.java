@@ -46,10 +46,13 @@ public class OsmSource {
 		Event event = dog.createEvent();
 		XPathResults results = new XPathResults(event);
 		event.setXMLBuilder(new DOMBuilder());
-		
+    
 		// declare event callback for when xpath node is hit
 		event.setListener(new InstantEvaluationListener(){
       
+      // Initialize count of loaded nodes
+      long nodeLoadedCount = 0;
+
       @Override
       public void onNodeHit(Expression expression, NodeItem nodeItem){
         
@@ -64,6 +67,10 @@ public class OsmSource {
 
         // write node to graph database
         graphDb.createNode(nodeJsonObject);
+
+        // output load progress
+        ++nodeLoadedCount;
+        if ( nodeLoadedCount % 1000 == 0) System.out.println("loaded " + nodeLoadedCount + " nodes..");
 
       }
 
@@ -100,7 +107,11 @@ public class OsmSource {
 
 		// declare event callback for when xpath is hit
 		event.setListener(new InstantEvaluationListener(){
-			@Override
+      
+      // Initialize count of loaded ways
+      long wayLoadedCount = 0;
+      
+      @Override
       public void onNodeHit(Expression expression, NodeItem wayItem) {
 					
 				// marshal XML way to JSON Object
@@ -135,6 +146,10 @@ public class OsmSource {
           graphDb.createRelationship(wayPropsObject, wayEndOsmId, wayStarOsmId);
         
         }
+
+        // output load progress
+        ++wayLoadedCount;
+        if ( wayLoadedCount % 1000 == 0) System.out.println("loaded " + wayLoadedCount + " ways..");
 
       }
 
