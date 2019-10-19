@@ -36,6 +36,8 @@ public class OsmSource {
 
   public void loadNodesIntoDb(GraphDb graphDb) throws Exception {
 
+    System.out.println("loading nodes into graph..");
+
     // configure xpath query
 		XMLDog dog = new XMLDog( new DefaultNamespaceContext() );
 		Expression xpath1 = dog.addXPath("/osm/node");
@@ -76,10 +78,14 @@ public class OsmSource {
 		// kick off dog sniffer
 		dog.sniff(event, this.osmInputSource, false);
 
+    System.out.println("finished loading nodes into graph");
+
   }
 
   public void loadWaysIntoGraph(GraphDb graphDb) throws Exception {
-		
+    
+    System.out.println("loading ways into graph..");
+
 		// configure xpath query - only include ways tagged as highways
 		XMLDog dog = new XMLDog(new DefaultNamespaceContext());
 		Expression xpath1 = dog.addXPath("/osm/way[tag/@k = 'highway']");
@@ -142,6 +148,8 @@ public class OsmSource {
 		
 		//kick off dog sniffer
 		dog.sniff(event, this.osmInputSource, false);
+
+    System.out.println("finished loading nodes into graph");
 
 	}
 

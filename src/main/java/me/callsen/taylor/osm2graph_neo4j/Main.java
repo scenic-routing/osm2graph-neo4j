@@ -25,8 +25,14 @@ public class Main {
     // Initialize OSM XML parser - parses XML using SAX event-driven style
     OsmSource osmSource = new OsmSource(osmFilePath);
 
+    graphDb.truncateGraphNodes();
+
+    graphDb.createNodeIdOsmIndex();
+
     // Load OSM nodes and properties into graph
     osmSource.loadNodesIntoDb(graphDb);
+    
+    osmSource.loadWaysIntoGraph(graphDb);
     
     // Shutdown GraphDB
     graphDb.shutdown();
