@@ -42,10 +42,13 @@ public class Main {
         osmSource.loadWaysIntoGraph(graphDb); 
         break; 
       case "createnodeindex": 
+        graphDb.dropNodeOsmIdIndex();  
         graphDb.createNodeIdOsmIndex(); 
         break;
       case "resetgraphdb": 
+        graphDb.dropNodeOsmIdIndex();
         graphDb.truncateGraphNodes();
+        graphDb.truncateGraphRelationships();
         break; 
       default: 
         System.out.println("Unsupported action - please try again"); 

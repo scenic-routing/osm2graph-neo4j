@@ -53,7 +53,7 @@ public class GraphDb {
 			
 			tx = this.db.beginTx();
 			
-			//retrieve start and stop nodes by osm_id (osm_source_id within graph); create relationship between nodes that will correspond to road / way
+			//retrieve start and stop nodes by osm_id (osm_Id within graph); create relationship between nodes that will correspond to road / way
 			Node startNode = this.db.findNode( NodeLabels.INTERSECTION , "osm_id", wayStartOsmId );
 			Node endNode = this.db.findNode( NodeLabels.INTERSECTION , "osm_id", wayEndOsmId );
 			Relationship newRelationship = startNode.createRelationshipTo( endNode , RelationshipTypes.CONNECTS );
@@ -185,7 +185,7 @@ public class GraphDb {
   
   public void dropNodeOsmIdIndex() {
 		
-		System.out.println("dropping node index for quick retrieval with osm_source_id");
+		System.out.println("dropping node index for quick retrieval with osm_Id");
 		
 		//drop index if exists
 		Transaction txdrop = null;
@@ -198,7 +198,7 @@ public class GraphDb {
 			txdrop.success();
 			
 		} catch (Exception e) {
-			System.out.println("warning - failed to drop osm_source_id index; index may not exist (not necessarily an issue"); 
+			System.out.println("warning - failed to drop osm_Id index; index may not exist (not necessarily an issue"); 
 		} finally {
 			txdrop.close();
 		}
