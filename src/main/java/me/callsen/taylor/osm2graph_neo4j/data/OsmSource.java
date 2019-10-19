@@ -39,16 +39,16 @@ public class OsmSource {
     System.out.println("loading nodes into graph..");
 
     // configure xpath query
-		XMLDog dog = new XMLDog( new DefaultNamespaceContext() );
-		Expression xpath1 = dog.addXPath("/osm/node");
-		
-		// configure sniffer and execute query
-		Event event = dog.createEvent();
-		XPathResults results = new XPathResults(event);
-		event.setXMLBuilder(new DOMBuilder());
+    XMLDog dog = new XMLDog( new DefaultNamespaceContext() );
+    Expression xpath1 = dog.addXPath("/osm/node");
     
-		// declare event callback for when xpath node is hit
-		event.setListener(new InstantEvaluationListener(){
+    // configure sniffer and execute query
+    Event event = dog.createEvent();
+    XPathResults results = new XPathResults(event);
+    event.setXMLBuilder(new DOMBuilder());
+    
+    // declare event callback for when xpath node is hit
+    event.setListener(new InstantEvaluationListener(){
       
       // Initialize count of loaded nodes
       long nodeLoadedCount = 0;
@@ -80,10 +80,10 @@ public class OsmSource {
       @Override
       public void onResult(Expression expression, Object result){ }
 
-		});		
-		
-		// kick off dog sniffer
-		dog.sniff(event, this.osmInputSource, false);
+    });		
+    
+    // kick off dog sniffer
+    dog.sniff(event, this.osmInputSource, false);
 
     System.out.println("finished loading nodes into graph");
 
@@ -93,30 +93,30 @@ public class OsmSource {
     
     System.out.println("loading ways into graph..");
 
-		// configure xpath query - only include ways tagged as highways
-		XMLDog dog = new XMLDog(new DefaultNamespaceContext());
-		Expression xpath1 = dog.addXPath("/osm/way[tag/@k = 'highway']");
-		
-		// configure sniffer and execute query
-		Event event = dog.createEvent();
-		XPathResults results = new XPathResults(event);
-		event.setXMLBuilder(new DOMBuilder());
+    // configure xpath query - only include ways tagged as highways
+    XMLDog dog = new XMLDog(new DefaultNamespaceContext());
+    Expression xpath1 = dog.addXPath("/osm/way[tag/@k = 'highway']");
+    
+    // configure sniffer and execute query
+    Event event = dog.createEvent();
+    XPathResults results = new XPathResults(event);
+    event.setXMLBuilder(new DOMBuilder());
     
     // configure GraphNodeShapeSource to use a source for Node longitutate and latitute
     INodeShapeSource nodeShapeSource = new GraphNodeShapeSource(graphDb);
 
-		// declare event callback for when xpath is hit
-		event.setListener(new InstantEvaluationListener(){
+    // declare event callback for when xpath is hit
+    event.setListener(new InstantEvaluationListener(){
       
       // Initialize count of loaded ways
       long wayLoadedCount = 0;
       
       @Override
       public void onNodeHit(Expression expression, NodeItem wayItem) {
-					
-				// marshal XML way to JSON Object
-				JSONObject rawWayJsonObject = xmlNodeToJson( (Node)wayItem.xml ).getJSONObject("way");
-				
+          
+        // marshal XML way to JSON Object
+        JSONObject rawWayJsonObject = xmlNodeToJson( (Node)wayItem.xml ).getJSONObject("way");
+        
         // retrieve list of nodes that comprise way
         JSONArray wayNodesList = rawWayJsonObject.optJSONArray("nd");
         if (wayNodesList == null) return; //skip if nodes not supplied or singular (we can't create a road here anyways)
@@ -159,57 +159,57 @@ public class OsmSource {
       @Override
       public void onResult(Expression expression, Object result){ }
 
-		});		
-		
-		//kick off dog sniffer
-		dog.sniff(event, this.osmInputSource, false);
+    });		
+    
+    //kick off dog sniffer
+    dog.sniff(event, this.osmInputSource, false);
 
     System.out.println("finished loading nodes into graph");
 
-	}
+  }
 
   // surely taken from stackoverflow
   public static JSONObject xmlNodeToJson(Node node) {
-		
-		// convert XML node to string
+    
+    // convert XML node to string
     StringWriter sw = new StringWriter();
     Transformer xmlT;
-		try {
+    try {
       xmlT = TransformerFactory.newInstance().newTransformer();
-			xmlT.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-			xmlT.setOutputProperty(OutputKeys.INDENT, "yes");
-			xmlT.transform(new DOMSource(node), new StreamResult(sw));
-		} catch (TransformerException te) {
-			System.out.println("error parsing Node XML to JSON");
-		}
-		String xmlNodeString = sw.toString();
-		
-		// parse string representation into JSONObject and return
+      xmlT.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+      xmlT.setOutputProperty(OutputKeys.INDENT, "yes");
+      xmlT.transform(new DOMSource(node), new StreamResult(sw));
+    } catch (TransformerException te) {
+      System.out.println("error parsing Node XML to JSON");
+    }
+    String xmlNodeString = sw.toString();
+    
+    // parse string representation into JSONObject and return
     return XML.toJSONObject( xmlNodeString );
     
   }
   
   public static JSONObject assembleOsmItemProps(JSONObject osmItem) {
-		
-		// create props object based on props of original item
-		JSONObject propsObject = new JSONObject(osmItem, JSONObject.getNames(osmItem));
+    
+    // create props object based on props of original item
+    JSONObject propsObject = new JSONObject(osmItem, JSONObject.getNames(osmItem));
 
     // tags - move from nested tag array and place as propreties directly on node 
-		if (osmItem.has("tag")) {
-			JSONArray tagsArray = osmItem.optJSONArray("tag");
-			if (tagsArray != null) {
-				// handle tags property as a JSONArray
-				for (int i = 0; i < tagsArray.length(); i++) {
-					JSONObject prop = tagsArray.getJSONObject(i);
-					propsObject.put(prop.getString("k"), prop.get("v"));
-				}
-			} else {
-				// if fails, handle tag property as a JSONObject
-				JSONObject tagObject = osmItem.getJSONObject("tag");
-				propsObject.put(tagObject.getString("k"), tagObject.get("v"));
-			}
-		}
-		
+    if (osmItem.has("tag")) {
+      JSONArray tagsArray = osmItem.optJSONArray("tag");
+      if (tagsArray != null) {
+        // handle tags property as a JSONArray
+        for (int i = 0; i < tagsArray.length(); i++) {
+          JSONObject prop = tagsArray.getJSONObject(i);
+          propsObject.put(prop.getString("k"), prop.get("v"));
+        }
+      } else {
+        // if fails, handle tag property as a JSONObject
+        JSONObject tagObject = osmItem.getJSONObject("tag");
+        propsObject.put(tagObject.getString("k"), tagObject.get("v"));
+      }
+    }
+    
     // move osm id to osm_id prop (so doesn't conflict with neo4j id)		
     propsObject.put("osm_id", osmItem.get("id"));
   
@@ -218,8 +218,8 @@ public class OsmSource {
     propsObject.remove("id");
     propsObject.remove("nd");
 
-		return propsObject;
-		
-	}
+    return propsObject;
+    
+  }
 
 }

@@ -5,7 +5,7 @@ import me.callsen.taylor.osm2graph_neo4j.data.OsmSource;
 
 public class Main {
 
-	public static void main( String[] args ) throws Exception {
+  public static void main( String[] args ) throws Exception {
     
     // Parameters
     //  ensure required args are specified - otherwise exit

@@ -13,8 +13,8 @@ import org.json.JSONArray;
 public class GeomUtil {
 
   //shared static references to geometry libraries
-	private static GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory( null );
-	public static WKTReader reader = new WKTReader( geometryFactory );
+  private static GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory( null );
+  public static WKTReader reader = new WKTReader( geometryFactory );
 
   public static void setWayGeometry( INodeShapeSource nodeShapeSource, JSONObject wayPropsObject , JSONArray wayNodesList , int wayStartIndex , int wayEndIndex ) {
     
