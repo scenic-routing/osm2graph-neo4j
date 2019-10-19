@@ -30,7 +30,6 @@ public class Main {
     // execute activity based on selected action
     switch(action) { 
       case "default": 
-        graphDb.truncateGraphNodes();
         graphDb.createNodeIdOsmIndex();
         osmSource.loadNodesIntoDb(graphDb);
         osmSource.loadWaysIntoGraph(graphDb);
