@@ -1,4 +1,4 @@
-# osm2graph Loader (Neo4j)
+# osm2graph Loader (Java-Neo4j)
 Imports OpenStreetMap data into a Neo4j graph database. Produces a simple schema that includes nodes, ways, and all properties/tags contained in the source OSM data.
 
 Designed to read OSM data in XML format. Uses SAX event-driven XML parsing to accomidate large XML files.
@@ -8,6 +8,7 @@ Designed to read OSM data in XML format. Uses SAX event-driven XML parsing to ac
 
 ## Schema
 ![alt text](https://taylor.callsen.me/wp-content/uploads/2019/10/tcallsen-osm2graph-schema-v1.jpg "Data model featuring graph nodes (OSM Nodes) and relationships (OSM Ways).")
+
 OSM Nodes are imported as graph nodes with the label of `INTERSECTION`. Their point geometry stored in WKT format in the `geom` property.
 
 OSM Ways are imported as relationships between the nodes (or intersections). Ways are labeled as `CONNECTS`, with their LineString WKT geometry stored in the `way` property. Only ways with a highway tag are imported (must match Xpath: `/osm/way[tag/@k = 'highway']`). More information about possible highway values is avilable [here](https://wiki.openstreetmap.org/wiki/Map_Features#Highway).
