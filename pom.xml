@@ -15,6 +15,7 @@
     <!-- command line parameter defaults -->
     <osmFile>default</osmFile>
     <graphDb>default</graphDb>
+    <action>default</action>
 
   </properties>
   <build>
@@ -25,11 +26,14 @@
         <version>1.4.0</version>
         <configuration>
           <mainClass>me.callsen.taylor.osm2graph_neo4j.Main</mainClass>
+          <!-- set command line parameter defaults -->
           <arguments>
             <argument>-osmFile</argument>
             <argument>${osmFile}</argument>
             <argument>-graphDb</argument>
             <argument>${graphDb}</argument>
+            <argument>-action</argument>
+            <argument>${action}</argument>
           </arguments>
         </configuration>
       </plugin>
