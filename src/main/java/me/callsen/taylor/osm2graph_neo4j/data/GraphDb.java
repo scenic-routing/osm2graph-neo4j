@@ -196,7 +196,7 @@ public class GraphDb {
       txdrop.success();
       
     } catch (Exception e) {
-      System.out.println("warning - failed to drop osm_Id index; index may not exist (not necessarily an issue"); 
+      System.out.println("warning - failed to drop osm_Id index; index may not exist (not necessarily an issue)"); 
     } finally {
       txdrop.close();
     }

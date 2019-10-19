@@ -164,7 +164,7 @@ public class OsmSource {
     //kick off dog sniffer
     dog.sniff(event, this.osmInputSource, false);
 
-    System.out.println("finished loading nodes into graph");
+    System.out.println("finished loading ways into graph");
 
   }
 
