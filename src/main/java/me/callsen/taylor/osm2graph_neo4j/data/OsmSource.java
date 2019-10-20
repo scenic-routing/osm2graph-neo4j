@@ -65,12 +65,12 @@ public class OsmSource {
         // add geom field
         nodeJsonObject.put("geom", "POINT(" + nodeJsonObject.getDouble("lon") + " " + nodeJsonObject.getDouble("lat") + ")");
 
-        // write node to graph database
+        // write node to graph database; commit every 5000 nodes
         graphDb.createNode(nodeJsonObject);
 
         // output load progress
         ++nodeLoadedCount;
-        if ( nodeLoadedCount % 1000 == 0) System.out.println("loaded " + nodeLoadedCount + " nodes..");
+        if ( nodeLoadedCount % 5000 == 0) System.out.println("loaded " + nodeLoadedCount + " nodes..");
 
       }
 
@@ -149,7 +149,7 @@ public class OsmSource {
 
         // output load progress
         ++wayLoadedCount;
-        if ( wayLoadedCount % 1000 == 0) System.out.println("loaded " + wayLoadedCount + " ways..");
+        if ( wayLoadedCount % 500 == 0) System.out.println("loaded " + wayLoadedCount + " ways..");
 
       }
 
