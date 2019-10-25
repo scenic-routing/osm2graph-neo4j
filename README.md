@@ -7,7 +7,7 @@ Designed to read OSM data in XML format. Uses SAX event-driven XML parsing to ac
 * Does not make use of any spatial indexing, or the Noe4j Spatial plugin. Geometries are stored in WKT format as properties on the created nodes and relationships.
 
 ## Schema
-![alt text](https://taylor.callsen.me/wp-content/uploads/2019/10/tcallsen-osm2graph-schema-v1.jpg "Data model featuring graph nodes (OSM Nodes) and relationships (OSM Ways).")
+![alt text](https://taylor.callsen.me/wp-content/uploads/2019/10/Tcallsen-Neo4j-graph-relationships.png "Data model featuring graph nodes (OSM Nodes) and relationships (OSM Ways).")
 
 OSM Nodes are imported as graph nodes with the label of `INTERSECTION`. Their point geometry stored in WKT format in the `geom` property.
 
