@@ -65,3 +65,8 @@ MATCH (a)-[r]-(b) WHERE r.highway = 'secondary' OR r.highway = 'residential' RET
 City exports of OSM data are made avaiable via [BBBike](https://download.bbbike.org/osm/bbbike/).
 
 Exports by country/region are available from [Geofabrik](http://download.geofabrik.de/).
+
+## More Information
+
+Here is a [blog entry](https://taylor.callsen.me/loading-openstreetmap-data-into-a-graph-database/) I wrote about creating this loader, which goes into further detail on a few of the design decisions and methodologies used.
+
