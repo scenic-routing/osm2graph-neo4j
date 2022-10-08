@@ -6,16 +6,16 @@ import me.callsen.taylor.osm2graph_neo4j.data.OsmSource;
 public class Main {
 
   public static void main( String[] args ) throws Exception {
-    
+
     // Parameters
     //  ensure required args are specified - otherwise exit
-    if (args[1].equals("default") || args[3].equals("default")) {
+    if (args.length < 2) {
       System.out.println("Required paramters not specified - exiting");
       System.exit(1);
     }
-    String osmFilePath = args[1];
-    String graphDbPath = args[3];
-    String action = args[5]; // action defaults to "default" per pom file
+    String osmFilePath = args[0];
+    String graphDbPath = args[1];
+    String action = (args.length > 2) ? args[2] : "default"; // action defaults to "default" per pom file
     System.out.println("OSM To Graph (Neo4j) Initialized with following parameters: ");
     System.out.println("   osmFile: " + osmFilePath);
     System.out.println("   graphDb: " + graphDbPath);
@@ -30,6 +30,7 @@ public class Main {
     // execute activity based on selected action
     switch(action) { 
       case "default": 
+        graphDb.dropNodeOsmIdIndex();  
         graphDb.createNodeIdOsmIndex();
         osmSource.loadNodesIntoDb(graphDb);
         osmSource.loadWaysIntoGraph(graphDb);
@@ -41,7 +42,7 @@ public class Main {
         osmSource.loadWaysIntoGraph(graphDb); 
         break; 
       case "createnodeindex": 
-        graphDb.dropNodeOsmIdIndex();  
+        graphDb.dropNodeOsmIdIndex();
         graphDb.createNodeIdOsmIndex(); 
         break;
       case "resetgraphdb": 

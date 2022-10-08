@@ -16,7 +16,8 @@ OSM Ways are imported as relationships between the nodes (or intersections). Way
 All other properties and tags in the source OSM data are flattened and attached as properties on the graph nodes/relationships that are created during import.
 
 ## Build
-Built with the Java 8 JDK and Neo4j Server Community (version: 3.5.11). Code should be fairly portable, as no advanced features of Java or Neo4j are used.
+
+Built with the Java 11 JDK and Neo4j Server Community (version: 4.4.1). Code should be fairly portable, as no advanced features of Java or Neo4j are used.
 
 This is a maven project and can be built using:
 ```
@@ -26,22 +27,20 @@ Make sure the Neo4j library version in the `pom.xml` file matches the Neo4j Serv
 
 ## Running
 
-The importer is executed through Maven and accepts 3 paramters:
+The importer is executed via `java` CLI and accepts 3 paramters in this order:
 1. **osmFile** - required - path to the source OSM XML file
 2. **graphDb** - required - filesystem path to the Neo4j GraphDB (web/Bolt API not supported)
 3. **action** - optional - allows execution of specific actions listed below (only needed in advanced scenarios)
 
 To perform the default import:
 ```
-mvn exec:java -DosmFile=/Users/Taylor/Downloads/SanFrancisco.osm -DgraphDb=/var/lib/neo4j/data/databases/graph.db 
+java -jar target/osm2graph-neo4j-0.0.2-SNAPSHOT.jar /Users/Taylor/Downloads/SanFrancisco.osm /var/lib/neo4j/data/databases/graph.db 
 ```
 
 To perform a specific action:
 ```
-mvn exec:java -DosmFile=/Users/Taylor/Downloads/SanFrancisco.osm -DgraphDb=/var/lib/neo4j/data/databases/graph.db -Daction=loadnodes
+java -jar target/osm2graph-neo4j-0.0.2-SNAPSHOT.jar /Users/Taylor/Downloads/SanFrancisco.osm /var/lib/neo4j/data/databases/graph.db loadnodes
 ```
-
-A Bash script has been included (`run.sh`) to simplify execution and provide a menu for selecting actions. Just be sure to set the `OSMFILEPATH` and `GRAPHDBPATH` variables up top.
 
 Available actions (all executed as part of defeault action):
 * **loadnodes** - Loads OSM nodes into GraphDB

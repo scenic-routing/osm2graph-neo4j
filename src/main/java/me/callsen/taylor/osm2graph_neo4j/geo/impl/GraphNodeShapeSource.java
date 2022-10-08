@@ -26,12 +26,10 @@ public class GraphNodeShapeSource implements INodeShapeSource {
       
       tx = this.db.beginTx();
       
-      Result result = this.db.execute( "MATCH (n:INTERSECTION) WHERE n.osm_id = " + osmId + " RETURN n.lon, n.lat" );
+      Result result = tx.execute( "MATCH (n:INTERSECTION) WHERE n.osm_id = " + osmId + " RETURN n.lon, n.lat" );
       Map<String,Object> row = result.next();
       returnString = row.get("n.lon").toString() + " " + row.get("n.lat").toString();
 
-      tx.success();
-      
     } catch (Exception e) {
       System.out.println("feailed to get lonLat string of osm id " + osmId); 
       e.printStackTrace();

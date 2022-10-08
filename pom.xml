@@ -3,40 +3,63 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.callsen.taylor</groupId>
   <artifactId>osm2graph-neo4j</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>OSM To Graph (Neo4j)</name>
+  <name>OSM To Graph (Neo4j 4.4)</name>
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-
-    <!-- command line parameter defaults -->
-    <osmFile>default</osmFile>
-    <graphDb>default</graphDb>
-    <action>default</action>
-
+    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
   </properties>
   <build>
     <plugins>
+
+      <!-- Bundle into single executable jar including dependencies -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.4.0</version>
-        <configuration>
-          <mainClass>me.callsen.taylor.osm2graph_neo4j.Main</mainClass>
-          <!-- set command line parameter defaults -->
-          <arguments>
-            <argument>-osmFile</argument>
-            <argument>${osmFile}</argument>
-            <argument>-graphDb</argument>
-            <argument>${graphDb}</argument>
-            <argument>-action</argument>
-            <argument>${action}</argument>
-          </arguments>
-        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.4.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+
+              <!-- Remove -shaded from compiled jar name - https://stackoverflow.com/a/70792515 -->
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <finalName>${project.artifactId}-${project.version}</finalName>
+
+              <!-- Not required for this project (house keeping) -->
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>me.callsen.taylor.osm2graph_neo4j.Main</mainClass>
+                </transformer>
+                <!-- Required for neo4j embedded db support - https://stackoverflow.com/a/60874959 -->
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+              </transformers>
+
+              <!-- Fixes manifest security errors "Invalid signature file digest for Manifest main attributes" - https://stackoverflow.com/a/55215382 -->
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/MANIFEST.MF</exclude>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
+
     </plugins>
   </build>
   <dependencies>
@@ -45,34 +68,40 @@
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j</artifactId>
-      <version>3.5.11</version>
+      <version>4.4.11</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.neo4j.driver</groupId>
+      <artifactId>neo4j-java-driver</artifactId>
+      <version>4.4.9</version>
     </dependency>
     
     <!-- XML Sniffer -->
     <dependency>
         <groupId>in.jlibs</groupId>
         <artifactId>jlibs-xmldog</artifactId>
-        <version>2.2.2</version>
+        <version>3.0.1</version>
     </dependency>
 
     <!-- JSON Objects -->
     <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
-        <version>20190722</version>
+        <version>20220924</version>
     </dependency>
 
     <!-- Geo Processing -->
     <dependency>
       <groupId>org.locationtech.jts</groupId>
       <artifactId>jts-core</artifactId>
-      <version>1.16.1</version>
+      <version>1.19.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-geometry</artifactId>
-      <version>21.2</version>
+      <version>22.2</version>
     </dependency>
 
   </dependencies>
@@ -83,9 +112,9 @@
     <repository>
       <id>osgeo</id>
       <name>Open Source Geospatial Foundation Repository</name>
-      <url>http://download.osgeo.org/webdav/geotools/</url>
+      <url>https://repo.osgeo.org/repository/release/</url>
     </repository>
 
-</repositories>
+  </repositories>
 
 </project>
