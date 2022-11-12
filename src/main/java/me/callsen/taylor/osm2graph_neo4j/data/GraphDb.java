@@ -118,6 +118,10 @@ public class GraphDb {
         
         newRelationship.setProperty(key, value);
       }
+
+      // explicitly set start and end osm ids (useful for filtering cypher queries by direction)
+      newRelationship.setProperty("start_osm_id", wayStartOsmId);
+      newRelationship.setProperty("end_osm_id", wayEndOsmId);
       
       // System.out.println("creating road relationship in Graph for node osm_ids " + wayStartOsmId + " and "+ wayEndOsmId + "; road relationship graph id " + newRelationship.getId() );
     } catch (Exception e) {
