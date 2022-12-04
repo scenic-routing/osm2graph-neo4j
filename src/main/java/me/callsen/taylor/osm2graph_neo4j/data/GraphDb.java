@@ -67,7 +67,7 @@ public class GraphDb {
 
   public void createNode(JSONObject nodeJsonObject) {
 
-    // try {
+    try {
     
       // use shared transaction if instantiated; otherwise create one	
       Node newIntersectionNode = this.sharedTransaction.createNode(NodeLabels.INTERSECTION);
@@ -86,14 +86,14 @@ public class GraphDb {
       }
        
       // System.out.println("created intersection for node id " + nodeJsonObject.getLong("osm_id"));
-    // } catch (Exception e) { 
-    //   System.out.println("FAILED to create intersection for node id " + nodeJsonObject.getInt("osm_id"));
-    //   e.printStackTrace();
-    // } finally {
+    } catch (Exception e) { 
+      System.out.println("FAILED to create intersection for node id " + nodeJsonObject.getInt("osm_id"));
+      e.printStackTrace();
+    } finally {
       // track amount of activity on shared transaction - commit to DB if interval reached
       this.sharedTransactionCount += 1;
-      if (this.sharedTransactionCount > this.SHARED_TRANSACTION_COMMIT_INTERVAL) this.commitSharedTransaction();
-    // }
+      if (this.sharedTransactionCount > SHARED_TRANSACTION_COMMIT_INTERVAL) this.commitSharedTransaction();
+    }
     
   }
 
@@ -113,9 +113,8 @@ public class GraphDb {
 
         // special fix for BigDecimal types, used fot lat/long e.g. -89.3837613
         if (value instanceof BigDecimal) {
-          value = ((BigDecimal)value).floatValue();
+          value = ((BigDecimal)value).doubleValue();
         }
-        
         newRelationship.setProperty(key, value);
       }
 
