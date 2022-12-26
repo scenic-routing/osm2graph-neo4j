@@ -199,6 +199,7 @@ public class GraphDb {
     try {
       Node indexNode = this.sharedTransaction.createNode(NodeLabels.INTERSECTION);
       indexNode.setProperty("osm_id", "indexNode");
+      indexNode.setProperty("geom", Values.pointValue(CoordinateReferenceSystem.get(4326), 90d, 90d));
     } catch (Exception e) {
       System.out.println("failed to create index node!"); 
       e.printStackTrace();
@@ -206,12 +207,21 @@ public class GraphDb {
       this.commitSharedTransaction();
     }
     
-    //create index
-    Transaction txB = null;
+    //create osm_id index
     try {
       this.sharedTransaction.execute( "CREATE INDEX ON :INTERSECTION(osm_id)" );
     } catch (Exception e) {
       System.out.println("failed to create index!"); 
+      e.printStackTrace();
+    } finally {
+      this.commitSharedTransaction();
+    }
+
+    //create point index - https://neo4j.com/docs/cypher-manual/current/syntax/spatial/#spatial-values-point-index
+    try {
+      this.sharedTransaction.execute( "CREATE POINT INDEX intersection_point_idx FOR (n:INTERSECTION) ON (n.geom)" );
+    } catch (Exception e) {
+      System.out.println("failed to create index!");
       e.printStackTrace();
     } finally {
       this.commitSharedTransaction();
