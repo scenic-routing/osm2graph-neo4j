@@ -1,10 +1,9 @@
 package me.callsen.taylor.osm2graph_neo4j.geo;
 
-import me.callsen.taylor.osm2graph_neo4j.geo.INodeShapeSource;
-
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
 import org.json.JSONObject;
@@ -47,12 +46,16 @@ public class GeomUtil {
         //append list of osm node attrId refs
         wayPropsObject.put("refOsmNodes", refOsmNodes.toString());
         
-        // utilized geotools library to compute length of road
-        LineString lineStringGeom = (LineString) reader.read(lineString);
+        // utilize geotools library to compute length of road
+        LineString lineStringGeom = getLineStringFromWkt(lineString);
         wayPropsObject.put("length", lineStringGeom.getLength() * (Math.PI/180) * 6378137); //http://gis.stackexchange.com/questions/14449/java-vividsolutions-jts-wgs-84-distance-to-meters
     
     } catch (Exception e) { e.printStackTrace(); }
         
+  }
+
+  public static LineString getLineStringFromWkt(String wktString) throws ParseException {
+    return (LineString) reader.read(wktString);
   }
 
 }

@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.nio.file.Paths;
 
 import org.json.JSONObject;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -17,6 +19,8 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.values.storable.CoordinateReferenceSystem;
 import org.neo4j.values.storable.PointValue;
 import org.neo4j.values.storable.Values;
+
+import me.callsen.taylor.osm2graph_neo4j.geo.GeomUtil;
 
 public class GraphDb {
 
@@ -131,7 +135,18 @@ public class GraphDb {
       // explicitly set start and end osm ids (useful for filtering cypher queries by direction)
       newRelationship.setProperty("start_osm_id", wayStartOsmId);
       newRelationship.setProperty("end_osm_id", wayEndOsmId);
-      
+
+      // set relationship geometry as array of Neo4j Points - geometry read from "way" proprety set in GeomUtil.setWayGeometry()
+      //  https://neo4j.com/docs/graphql-manual/current/type-definitions/types/#type-definitions-types-point
+      //  https://github.com/neo4j/neo4j/blob/3.5/community/values/src/main/java/org/neo4j/values/storable/Values.java#L385
+      LineString relationshipGeometry = GeomUtil.getLineStringFromWkt(wayJsonObject.getString("way"));
+      PointValue[] relationshipPoints = new PointValue[relationshipGeometry.getCoordinates().length];
+      for (int i = 0; i < relationshipGeometry.getCoordinates().length; ++i ) {
+        Coordinate coord = relationshipGeometry.getCoordinateN(i);
+        relationshipPoints[i] = Values.pointValue(CoordinateReferenceSystem.get(4326), coord.x, coord.y);
+      }
+      newRelationship.setProperty("geom", relationshipPoints);
+
       // System.out.println("creating road relationship in Graph for node osm_ids " + wayStartOsmId + " and "+ wayEndOsmId + "; road relationship graph id " + newRelationship.getId() );
     } catch (Exception e) {
       System.out.println("FAILED to create road relationship in Graph for node osm_ids " + wayStartOsmId + " and "+ wayEndOsmId + "; road relationship id road id not available" ); 

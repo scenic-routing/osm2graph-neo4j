@@ -4,7 +4,6 @@ import org.xml.sax.InputSource;
 import jlibs.xml.DefaultNamespaceContext;
 import jlibs.xml.sax.dog.NodeItem;
 import jlibs.xml.sax.dog.XMLDog;
-import jlibs.xml.sax.dog.XPathResults;
 import jlibs.xml.sax.dog.expr.Expression;
 import jlibs.xml.sax.dog.expr.InstantEvaluationListener;
 import jlibs.xml.sax.dog.sniff.DOMBuilder;
@@ -130,13 +129,11 @@ public class OsmSource {
           // forward
           
           GeomUtil.setWayGeometry(nodeShapeSource, wayPropsObject, wayNodesList, nodeIndex, nodeIndex - 1 );
-          String geometry = wayPropsObject.getString("way");
           graphDb.createRelationship(wayPropsObject, wayStarOsmId, wayEndOsmId);
           
           // backward - flip the start and stop Nodes to create the same relationship in the other direction (Neo4j does not support bi-directional relationships)
           
           GeomUtil.setWayGeometry(nodeShapeSource, wayPropsObject, wayNodesList, nodeIndex - 1 , nodeIndex );
-          geometry = wayPropsObject.getString("way");
           graphDb.createRelationship(wayPropsObject, wayEndOsmId, wayStarOsmId);
         
         }

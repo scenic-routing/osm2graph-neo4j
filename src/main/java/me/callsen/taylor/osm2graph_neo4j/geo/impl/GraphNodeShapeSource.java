@@ -4,7 +4,6 @@ import me.callsen.taylor.osm2graph_neo4j.data.GraphDb;
 import me.callsen.taylor.osm2graph_neo4j.geo.INodeShapeSource;
 
 import java.util.Map;
-import org.json.JSONObject;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.Result;

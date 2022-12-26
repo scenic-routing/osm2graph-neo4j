@@ -59,6 +59,12 @@ Get street by type:
 MATCH (a)-[r]-(b) WHERE r.highway = 'secondary' OR r.highway = 'residential' RETURN a, r, b
 ```
 
+### Indexes
+
+```
+CALL db.indexes();
+```
+
 ## OSM Data Sources
 
 City exports of OSM data are made avaiable via [BBBike](https://download.bbbike.org/osm/bbbike/).
