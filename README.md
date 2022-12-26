@@ -34,12 +34,12 @@ The importer is executed via `java` CLI and accepts 3 paramters in this order:
 
 To perform the default import:
 ```
-java -jar target/osm2graph-neo4j-0.0.2-SNAPSHOT.jar /Users/Taylor/Downloads/SanFrancisco.osm /var/lib/neo4j/data/databases/graph.db 
+java -jar target/osm2graph-neo4j-0.1.0-SNAPSHOT.jar /development/workspace/SanFrancisco.osm /development/workspace/neo4j/graph.db
 ```
 
 To perform a specific action:
 ```
-java -jar target/osm2graph-neo4j-0.0.2-SNAPSHOT.jar /Users/Taylor/Downloads/SanFrancisco.osm /var/lib/neo4j/data/databases/graph.db loadnodes
+java -jar target/osm2graph-neo4j-0.1.0-SNAPSHOT.jar /development/workspace/SanFrancisco.osm /development/workspace/neo4j/graph.db loadnodes
 ```
 
 Available actions (all executed as part of defeault action):

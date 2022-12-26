@@ -1,5 +1,7 @@
 package me.callsen.taylor.osm2graph_neo4j.data;
 
+import static org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAME;
+
 import java.math.BigDecimal;
 import java.nio.file.Paths;
 
@@ -12,8 +14,9 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
-
-import static org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAME;
+import org.neo4j.values.storable.CoordinateReferenceSystem;
+import org.neo4j.values.storable.PointValue;
+import org.neo4j.values.storable.Values;
 
 public class GraphDb {
 
@@ -72,7 +75,7 @@ public class GraphDb {
       // use shared transaction if instantiated; otherwise create one	
       Node newIntersectionNode = this.sharedTransaction.createNode(NodeLabels.INTERSECTION);
       
-      //apply properties to Node object
+      // apply properties to Node object
       for (String key : nodeJsonObject.keySet()) {
         
         Object value = nodeJsonObject.get(key);
@@ -84,7 +87,14 @@ public class GraphDb {
 
         newIntersectionNode.setProperty(key, value);
       }
-       
+
+      // add geom as WKT
+      newIntersectionNode.setProperty("geom_wkt", "POINT(" + nodeJsonObject.getDouble("lon") + " " + nodeJsonObject.getDouble("lat") + ")");
+
+      // add geom as Neo4j Point - https://neo4j.com/docs/graphql-manual/current/type-definitions/types/#type-definitions-types-point
+      PointValue pointValue = Values.pointValue(CoordinateReferenceSystem.get(4326), nodeJsonObject.getDouble("lon"), nodeJsonObject.getDouble("lat"));
+      newIntersectionNode.setProperty("geom", pointValue);
+
       // System.out.println("created intersection for node id " + nodeJsonObject.getLong("osm_id"));
     } catch (Exception e) { 
       System.out.println("FAILED to create intersection for node id " + nodeJsonObject.getInt("osm_id"));

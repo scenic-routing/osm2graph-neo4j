@@ -40,11 +40,10 @@ public class OsmSource {
 
     // configure xpath query
     XMLDog dog = new XMLDog( new DefaultNamespaceContext() );
-    Expression xpath1 = dog.addXPath("/osm/node");
+    dog.addXPath("/osm/node");
     
     // configure sniffer and execute query
     Event event = dog.createEvent();
-    XPathResults results = new XPathResults(event);
     event.setXMLBuilder(new DOMBuilder());
     
     // declare event callback for when xpath node is hit
@@ -61,9 +60,6 @@ public class OsmSource {
 
         // prepare osm item props for ingest into Neo4j (move id, flatten tags array)
         JSONObject nodeJsonObject = assembleOsmItemProps(rawNodeJsonObject);
-
-        // add geom field
-        nodeJsonObject.put("geom", "POINT(" + nodeJsonObject.getDouble("lon") + " " + nodeJsonObject.getDouble("lat") + ")");
 
         // write node to graph database; commit every 5000 nodes
         graphDb.createNode(nodeJsonObject);
@@ -95,11 +91,10 @@ public class OsmSource {
 
     // configure xpath query - only include ways tagged as highways
     XMLDog dog = new XMLDog(new DefaultNamespaceContext());
-    Expression xpath1 = dog.addXPath("/osm/way[tag/@k = 'highway']");
+    dog.addXPath("/osm/way[tag/@k = 'highway']");
     
     // configure sniffer and execute query
     Event event = dog.createEvent();
-    XPathResults results = new XPathResults(event);
     event.setXMLBuilder(new DOMBuilder());
     
     // configure GraphNodeShapeSource to use a source for Node longitutate and latitute
@@ -121,7 +116,6 @@ public class OsmSource {
         JSONArray wayNodesList = rawWayJsonObject.optJSONArray("nd");
         if (wayNodesList == null) return; //skip if nodes not supplied or singular (we can't create a road here anyways)
         
-
         // assemble way properties object from any XML properties - shared/overwritten in all iterations of for loop below
         JSONObject wayPropsObject = assembleOsmItemProps(rawWayJsonObject);
         

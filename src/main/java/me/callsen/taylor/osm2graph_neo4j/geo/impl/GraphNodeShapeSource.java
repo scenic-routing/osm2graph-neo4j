@@ -31,7 +31,7 @@ public class GraphNodeShapeSource implements INodeShapeSource {
       returnString = row.get("n.lon").toString() + " " + row.get("n.lat").toString();
 
     } catch (Exception e) {
-      System.out.println("feailed to get lonLat string of osm id " + osmId); 
+      System.out.println("failed to get lonLat string of osm id " + osmId); 
       e.printStackTrace();
     } finally {
       tx.close();
