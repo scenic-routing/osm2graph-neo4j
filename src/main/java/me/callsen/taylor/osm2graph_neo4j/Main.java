@@ -29,9 +29,11 @@ public class Main {
 
     // execute activity based on selected action
     switch(action) { 
-      case "default": 
-        graphDb.dropNodeOsmIdIndex();  
-        graphDb.createNodeIdOsmIndex();
+      case "default":
+        graphDb.dropNodeIndexes();
+        graphDb.dropRelationshipIndexes();
+        graphDb.createNodeIndexes();
+        graphDb.createRelationshipIndexes();
         osmSource.loadNodesIntoDb(graphDb);
         osmSource.loadWaysIntoGraph(graphDb);
         break; 
@@ -41,12 +43,15 @@ public class Main {
       case "loadways": 
         osmSource.loadWaysIntoGraph(graphDb); 
         break; 
-      case "createnodeindex": 
-        graphDb.dropNodeOsmIdIndex();
-        graphDb.createNodeIdOsmIndex(); 
+      case "createindexes":
+        graphDb.dropNodeIndexes();
+        graphDb.dropRelationshipIndexes();
+        graphDb.createNodeIndexes();
+        graphDb.createRelationshipIndexes();
         break;
       case "resetgraphdb": 
-        graphDb.dropNodeOsmIdIndex();
+        graphDb.dropNodeIndexes();
+        graphDb.dropRelationshipIndexes();
         graphDb.truncateGraphNodes();
         graphDb.truncateGraphRelationships();
         break; 

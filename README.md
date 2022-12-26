@@ -45,7 +45,7 @@ java -jar target/osm2graph-neo4j-0.1.0-SNAPSHOT.jar /development/workspace/SanFr
 Available actions (all executed as part of defeault action):
 * **loadnodes** - Loads OSM nodes into GraphDB
 * **loadways** - Loads OSM ways into GraphDB
-* **createnodeindex** - Creates an GraphDB index of Nodes on the `osm_id` property; used to speed up node lookup during way import
+* **createindexes** - Creates an GraphDB index of Nodes and Relationships on the `osm_id` property (Nodes only) and `geom` property; used to speed up node lookup during way import, and support [geospatial queries](https://neo4j.com/docs/cypher-manual/current/functions/spatial/)
 * **resetgraphdb** - Clears the GraphDB of all nodes, relationships, and indeces
  
 ## Sample Cypher Queries

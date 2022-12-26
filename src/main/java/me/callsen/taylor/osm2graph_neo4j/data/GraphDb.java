@@ -206,15 +206,15 @@ public class GraphDb {
     
   }
   
-  public void createNodeIdOsmIndex() {
-    
-    System.out.println("creating node index for quick retrieval with osm_id");
-    
+  public void createNodeIndexes() {
+
+    System.out.println("creating node index for quick retrieval with osm_id and geom");
+
     //create node to create index off of
     try {
       Node indexNode = this.sharedTransaction.createNode(NodeLabels.INTERSECTION);
       indexNode.setProperty("osm_id", "indexNode");
-      indexNode.setProperty("geom", Values.pointValue(CoordinateReferenceSystem.get(4326), 90d, 90d));
+      indexNode.setProperty("geom", Values.pointValue(CoordinateReferenceSystem.get(4326), 50d, 50d));
     } catch (Exception e) {
       System.out.println("failed to create index node!"); 
       e.printStackTrace();
@@ -254,20 +254,91 @@ public class GraphDb {
     }
     
   }
+
+  public void createRelationshipIndexes() {
+
+    System.out.println("creating relationship index for quick retrieval with geom");
+
+    // create relationship to create index off of
+    try {
+      Node startNode = this.sharedTransaction.createNode(NodeLabels.INTERSECTION);
+      Node endNode = this.sharedTransaction.createNode(NodeLabels.INTERSECTION);
+      Relationship rel = startNode.createRelationshipTo(endNode, RelationshipTypes.CONNECTS);
+
+      // used for lookup during delection
+      startNode.setProperty("osm_id", "start");
+      endNode.setProperty("osm_id", "end");
+      rel.setProperty("osm_id", "rel");
+
+      // set mock point array as geom
+      PointValue[] points = new PointValue[2];
+      points[0] = Values.pointValue(CoordinateReferenceSystem.get(4326), 50d, 50d);
+      points[1] = Values.pointValue(CoordinateReferenceSystem.get(4326), 51d, 51d);
+      rel.setProperty("geom", points);
+
+    } catch (Exception e) {
+      System.out.println("failed to create index relationship!");
+      e.printStackTrace();
+    } finally {
+      this.commitSharedTransaction();
+    }
+
+    // create point index on geom - https://neo4j.com/docs/cypher-manual/current/syntax/spatial/#spatial-values-point-index
+    try {
+      this.sharedTransaction.execute( "CREATE POINT INDEX way_point_idx FOR ()-[r:CONNECTS]-() ON (r.geom)" );
+    } catch (Exception e) {
+      System.out.println("failed to create relationship index!");
+      e.printStackTrace();
+    } finally {
+      this.commitSharedTransaction();
+    }
+
+    // delete relationship that index was created with
+    try {
+      Relationship rel = this.sharedTransaction.findRelationship( RelationshipTypes.CONNECTS , "osm_id", "rel" );
+      rel.delete();
+      Node startNode = this.sharedTransaction.findNode( NodeLabels.INTERSECTION , "osm_id", "start" );
+      startNode.delete();
+      Node endNode = this.sharedTransaction.findNode( NodeLabels.INTERSECTION , "osm_id", "end" );
+      endNode.delete();
+    } catch (Exception e) {
+      System.out.println("failed to delete relationship index nodes/rel!"); 
+      e.printStackTrace();
+    } finally {
+      this.commitSharedTransaction();
+    }
+
+  }
   
-  public void dropNodeOsmIdIndex() {
+  public void dropNodeIndexes() {
     
     System.out.println("dropping node index for quick retrieval with osm_Id");
     
     //drop index if exists
     try {
       this.sharedTransaction.execute( "DROP INDEX ON :INTERSECTION(osm_id)" );
+      this.sharedTransaction.execute( "DROP INDEX way_point_idx" );
     } catch (Exception e) {
       System.out.println("warning - failed to drop osm_Id index; index may not exist (not necessarily an issue)");
     } finally {
       this.commitSharedTransaction();
     }
     
+  }
+
+  public void dropRelationshipIndexes() {
+
+    System.out.println("dropping relationship index for quick retrieval with geom");
+
+    //drop index if exists
+    try {
+      this.sharedTransaction.execute( "DROP INDEX intersection_point_idx" );
+    } catch (Exception e) {
+      System.out.println("warning - failed to drop relationship geom index; index may not exist (not necessarily an issue)");
+    } finally {
+      this.commitSharedTransaction();
+    }
+
   }
 
 }
