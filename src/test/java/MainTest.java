@@ -21,7 +21,7 @@ import me.callsen.taylor.osm2graph_neo4j.data.GraphDb;
 import me.callsen.taylor.osm2graph_neo4j.data.OsmSource;
 
 @TestInstance(Lifecycle.PER_CLASS)
-public class GraphDbTest {
+public class MainTest {
   
   @TempDir
   private static Path directory;
