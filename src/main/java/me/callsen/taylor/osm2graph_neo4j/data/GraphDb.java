@@ -4,6 +4,8 @@ import static org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAM
 
 import java.math.BigDecimal;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONObject;
 import org.locationtech.jts.geom.Coordinate;
@@ -36,9 +38,17 @@ public class GraphDb {
   private int sharedTransactionCount = 0;
 
   public GraphDb(String graphDbPath) throws Exception {
-    
+
+    // supply config options to reduce database size
+    Map<String, String> configRaw = new HashMap<String, String>();
+    configRaw.put("dbms.tx_log.rotation.retention_policy", "1 files");
+    configRaw.put("dbms.tx_log.rotation.size", "1M");
+    configRaw.put("dbms.tx_log.rotation.retention_policy","keep_none");
+
     // initialize graph db connection
-    managementService = new DatabaseManagementServiceBuilder( Paths.get( graphDbPath ) ).build();
+    managementService = new DatabaseManagementServiceBuilder( Paths.get( graphDbPath ) )
+      .setConfigRaw(configRaw)
+      .build();
     db = managementService.database( DEFAULT_DATABASE_NAME );
     // db = new GraphDatabaseFactory().newEmbeddedDatabase( new File( graphDbPath ) );
     System.out.println("Graph DB @ " + graphDbPath + " initialized");
