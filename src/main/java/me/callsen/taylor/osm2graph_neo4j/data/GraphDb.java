@@ -53,6 +53,10 @@ public class GraphDb {
     this.commitSharedTransaction(true);
   }
 
+  public Transaction getTransaction() {
+    return db.beginTx();
+  }
+
   private void commitSharedTransaction(boolean openNewTransaction) {
     
     try {
@@ -155,7 +159,7 @@ public class GraphDb {
       // track amount of activity on shared transaction - commit to DB if interval reached
       //   - move at faster rate than nodes since ways contain much more data
       this.sharedTransactionCount += 500;
-      if (this.sharedTransactionCount > this.SHARED_TRANSACTION_COMMIT_INTERVAL) this.commitSharedTransaction();
+      if (this.sharedTransactionCount > SHARED_TRANSACTION_COMMIT_INTERVAL) this.commitSharedTransaction();
     }
     
   }
