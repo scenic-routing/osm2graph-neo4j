@@ -58,6 +58,7 @@ public class MainTest {
       // assertEquals(676, count);
       assertEquals(5368, count);
     }
+    tx.close();
   }
 
   @Test
@@ -80,6 +81,7 @@ public class MainTest {
       // properties
       assertEquals(1, node.getProperty("version"));
     }
+    tx.close();
   }
 
   @Test
@@ -91,6 +93,7 @@ public class MainTest {
       long count = (Long) row.get("total");
       assertEquals(670, count);
     }
+    tx.close();
   }
 
   @Test
@@ -102,6 +105,7 @@ public class MainTest {
       long count = (Long) row.get("total");
       assertEquals(4, count);
     }
+    tx.close();
   }
 
   @Test
@@ -128,6 +132,7 @@ public class MainTest {
       // properties
       assertEquals("residential", rel.getProperty("highway"));
     }
+    tx.close();
   }
 
 }
