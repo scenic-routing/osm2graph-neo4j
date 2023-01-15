@@ -3,6 +3,8 @@ Imports OpenStreetMap data into a Neo4j graph database. Produces a simple schema
 
 Designed to read OSM data in XML format. Uses SAX event-driven XML parsing to accomidate large XML files.
 
+Uses the [scenic-routing/javasdk](https://github.com/scenic-routing/javasdk) to help with Neo4j Graph database interactions.
+
 ## Schema
 ![alt text](https://taylor.callsen.me/wp-content/uploads/2019/10/Tcallsen-Neo4j-graph-relationships.png "Data model featuring graph nodes (OSM Nodes) and relationships (OSM Ways).")
 
@@ -103,6 +105,14 @@ CALL db.indexes();
 City exports of OSM data are made avaiable via [BBBike](https://download.bbbike.org/osm/bbbike/).
 
 Exports by country/region are available from [Geofabrik](http://download.geofabrik.de/).
+
+## Tests
+
+JUnit tests can be executed with the following command:
+
+```
+mvn test
+```
 
 ## More Information
 

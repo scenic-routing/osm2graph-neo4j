@@ -1,6 +1,20 @@
 package me.callsen.taylor.osm2graph_neo4j.data;
 
+import java.io.StringWriter;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.XML;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
+
 import jlibs.xml.DefaultNamespaceContext;
 import jlibs.xml.sax.dog.NodeItem;
 import jlibs.xml.sax.dog.XMLDog;
@@ -8,22 +22,9 @@ import jlibs.xml.sax.dog.expr.Expression;
 import jlibs.xml.sax.dog.expr.InstantEvaluationListener;
 import jlibs.xml.sax.dog.sniff.DOMBuilder;
 import jlibs.xml.sax.dog.sniff.Event;
-
 import me.callsen.taylor.osm2graph_neo4j.geo.GeomUtil;
 import me.callsen.taylor.osm2graph_neo4j.geo.INodeShapeSource;
 import me.callsen.taylor.osm2graph_neo4j.geo.impl.GraphNodeShapeSource;
-
-import java.io.StringWriter;
-import org.w3c.dom.Node;
-import org.json.JSONObject;
-import org.json.JSONArray;
-import org.json.XML;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 public class OsmSource {
 
@@ -33,7 +34,7 @@ public class OsmSource {
     osmInputSource = new InputSource(osmFilePath);
   }
 
-  public void loadNodesIntoDb(GraphDb graphDb) throws Exception {
+  public void loadNodesIntoDb(GraphDbLoader graphDbLoader) throws Exception {
 
     System.out.println("loading nodes into graph..");
 
@@ -61,7 +62,7 @@ public class OsmSource {
         JSONObject nodeJsonObject = assembleOsmItemProps(rawNodeJsonObject);
 
         // write node to graph database; commit every 5000 nodes
-        graphDb.createNode(nodeJsonObject);
+        graphDbLoader.createNode(nodeJsonObject);
 
         // output load progress
         ++nodeLoadedCount;
@@ -84,7 +85,7 @@ public class OsmSource {
 
   }
 
-  public void loadWaysIntoGraph(GraphDb graphDb) throws Exception {
+  public void loadWaysIntoGraph(GraphDbLoader graphDbLoader) throws Exception {
     
     System.out.println("loading ways into graph..");
 
@@ -97,7 +98,7 @@ public class OsmSource {
     event.setXMLBuilder(new DOMBuilder());
     
     // configure GraphNodeShapeSource to use a source for Node longitutate and latitute
-    INodeShapeSource nodeShapeSource = new GraphNodeShapeSource(graphDb);
+    INodeShapeSource nodeShapeSource = new GraphNodeShapeSource(graphDbLoader);
 
     // declare event callback for when xpath is hit
     event.setListener(new InstantEvaluationListener(){
@@ -129,12 +130,12 @@ public class OsmSource {
           // forward
           
           GeomUtil.setWayGeometry(nodeShapeSource, wayPropsObject, wayNodesList, nodeIndex, nodeIndex - 1 );
-          graphDb.createRelationship(wayPropsObject, wayStarOsmId, wayEndOsmId);
+          graphDbLoader.createRelationship(wayPropsObject, wayStarOsmId, wayEndOsmId);
           
           // backward - flip the start and stop Nodes to create the same relationship in the other direction (Neo4j does not support bi-directional relationships)
           
           GeomUtil.setWayGeometry(nodeShapeSource, wayPropsObject, wayNodesList, nodeIndex - 1 , nodeIndex );
-          graphDb.createRelationship(wayPropsObject, wayEndOsmId, wayStarOsmId);
+          graphDbLoader.createRelationship(wayPropsObject, wayEndOsmId, wayStarOsmId);
         
         }
 

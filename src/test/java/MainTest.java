@@ -17,7 +17,7 @@ import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.spatial.Point;
 
-import me.callsen.taylor.osm2graph_neo4j.data.GraphDb;
+import me.callsen.taylor.osm2graph_neo4j.data.GraphDbLoader;
 import me.callsen.taylor.osm2graph_neo4j.data.OsmSource;
 
 @TestInstance(Lifecycle.PER_CLASS)
@@ -26,7 +26,7 @@ public class MainTest {
   @TempDir
   private static Path directory;
 
-  private static GraphDb db;
+  private static GraphDbLoader graphDbLoader;
 
   private static OsmSource source;
 
@@ -36,21 +36,21 @@ public class MainTest {
     ClassLoader classLoader = getClass().getClassLoader();
     source = new OsmSource(classLoader.getResource("xml/sf-potrero.osm").getFile());
     assertNotNull(source);
-    db = new GraphDb(directory.toFile().getAbsolutePath());
-    assertNotNull(db);
+    graphDbLoader = new GraphDbLoader(directory.toFile().getAbsolutePath());
+    assertNotNull(graphDbLoader);
 
-    source.loadNodesIntoDb(db);
-    source.loadWaysIntoGraph(db);
+    source.loadNodesIntoDb(graphDbLoader);
+    source.loadWaysIntoGraph(graphDbLoader);
   }
 
   @AfterAll
   public void shutdownResources() {
-    db.shutdown();
+    graphDbLoader.shutdown();
   }
 
   @Test
   public void testNodeCount() throws Exception {
-    Transaction tx = db.getTransaction();
+    Transaction tx = graphDbLoader.getTransaction();
     Result result = tx.execute("MATCH (n) RETURN COUNT(DISTINCT(n)) AS total");
     while ( result.hasNext() ) {
       Map<String, Object> row = result.next();
@@ -63,7 +63,7 @@ public class MainTest {
 
   @Test
   public void testNodeProperties() throws Exception {
-    Transaction tx = db.getTransaction();
+    Transaction tx = graphDbLoader.getTransaction();
     Result result = tx.execute("MATCH (n) WHERE n.osm_id=65354557 RETURN n");
     while ( result.hasNext() ) {
       Map<String, Object> row = result.next();
@@ -86,7 +86,7 @@ public class MainTest {
 
   @Test
   public void testRelationshipCount() throws Exception {
-    Transaction tx = db.getTransaction();
+    Transaction tx = graphDbLoader.getTransaction();
     Result result = tx.execute("MATCH ()-[r]-() RETURN COUNT(DISTINCT(r)) AS total");
     while ( result.hasNext() ) {
       Map<String, Object> row = result.next();
@@ -98,7 +98,7 @@ public class MainTest {
 
   @Test
   public void testRelationshipCreatedCount() throws Exception {
-    Transaction tx = db.getTransaction();
+    Transaction tx = graphDbLoader.getTransaction();
     Result result = tx.execute("MATCH (a)-[r]-(b) WHERE a.osm_id=65354557 RETURN COUNT(DISTINCT(r)) AS total");
     while ( result.hasNext() ) {
       Map<String, Object> row = result.next();
@@ -110,7 +110,7 @@ public class MainTest {
 
   @Test
   public void testRelationshipProperties() throws Exception {
-    Transaction tx = db.getTransaction();
+    Transaction tx = graphDbLoader.getTransaction();
     Result result = tx.execute("MATCH ()-[r]-() WHERE r.start_osm_id=65354557 AND r.end_osm_id=6916235511 return DISTINCT(r)");
     while ( result.hasNext() ) {
       Map<String, Object> row = result.next();

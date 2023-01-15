@@ -72,6 +72,13 @@
   </build>
   <dependencies>
 
+    <!-- Scenic Routing SDK -->
+    <dependency>
+      <groupId>com.github.scenic-routing</groupId>
+      <artifactId>javasdk</artifactId>
+      <version>1.1.0</version>
+    </dependency>
+
     <!-- Neo4j -->
     <dependency>
       <groupId>org.neo4j</groupId>
@@ -112,7 +119,6 @@
       <version>22.2</version>
     </dependency>
 
-    <!-- Testing -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
@@ -136,6 +142,12 @@
       <id>osgeo</id>
       <name>Open Source Geospatial Foundation Repository</name>
       <url>https://repo.osgeo.org/repository/release/</url>
+    </repository>
+
+    <!-- Jitpack (for Scenic Routing SDK -->
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
     </repository>
 
   </repositories>

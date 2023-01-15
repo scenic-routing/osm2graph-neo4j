@@ -1,6 +1,6 @@
 package me.callsen.taylor.osm2graph_neo4j;
 
-import me.callsen.taylor.osm2graph_neo4j.data.GraphDb;
+import me.callsen.taylor.osm2graph_neo4j.data.GraphDbLoader;
 import me.callsen.taylor.osm2graph_neo4j.data.OsmSource;
 
 public class Main {
@@ -22,7 +22,7 @@ public class Main {
     System.out.println("   action:  " + action);
 
     // Initialize GraphDB wrapper - facilitates loading of data into Neo4j Graph
-    GraphDb graphDb = new GraphDb(graphDbPath);
+    GraphDbLoader graphDbLoader = new GraphDbLoader(graphDbPath);
 
     // Initialize OSM XML parser - parses XML using SAX event-driven style
     OsmSource osmSource = new OsmSource(osmFilePath);
@@ -30,37 +30,37 @@ public class Main {
     // execute activity based on selected action
     switch(action) { 
       case "default":
-        graphDb.dropNodeIndexes();
-        graphDb.dropRelationshipIndexes();
-        graphDb.createNodeIndexes();
-        graphDb.createRelationshipIndexes();
-        osmSource.loadNodesIntoDb(graphDb);
-        osmSource.loadWaysIntoGraph(graphDb);
+        graphDbLoader.dropNodeIndexes();
+        graphDbLoader.dropRelationshipIndexes();
+        graphDbLoader.createNodeIndexes();
+        graphDbLoader.createRelationshipIndexes();
+        osmSource.loadNodesIntoDb(graphDbLoader);
+        osmSource.loadWaysIntoGraph(graphDbLoader);
         break; 
       case "loadnodes": 
-        osmSource.loadNodesIntoDb(graphDb); 
+        osmSource.loadNodesIntoDb(graphDbLoader); 
         break; 
       case "loadways": 
-        osmSource.loadWaysIntoGraph(graphDb); 
+        osmSource.loadWaysIntoGraph(graphDbLoader); 
         break; 
       case "createindexes":
-        graphDb.dropNodeIndexes();
-        graphDb.dropRelationshipIndexes();
-        graphDb.createNodeIndexes();
-        graphDb.createRelationshipIndexes();
+        graphDbLoader.dropNodeIndexes();
+        graphDbLoader.dropRelationshipIndexes();
+        graphDbLoader.createNodeIndexes();
+        graphDbLoader.createRelationshipIndexes();
         break;
       case "resetgraphdb": 
-        graphDb.dropNodeIndexes();
-        graphDb.dropRelationshipIndexes();
-        graphDb.truncateGraphNodes();
-        graphDb.truncateGraphRelationships();
+        graphDbLoader.dropNodeIndexes();
+        graphDbLoader.dropRelationshipIndexes();
+        graphDbLoader.truncateGraphNodes();
+        graphDbLoader.truncateGraphRelationships();
         break; 
       default: 
         System.out.println("Unsupported action - please try again"); 
     }
 
     // Shutdown GraphDB
-    graphDb.shutdown();
+    graphDbLoader.shutdown();
 
     System.out.println("Task complete");
 
